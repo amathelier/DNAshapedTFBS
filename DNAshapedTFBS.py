@@ -3,17 +3,17 @@
 
 """ Train and apply TFFM/PSSM + DNAshape classifiers. """
 
-import os
-PATH = os.path.dirname(os.path.realpath(__file__))
-import sys
+#import os
+#PATH = os.path.dirname(os.path.realpath(__file__))
+#import sys
 # Local environment
-sys.path.append('{0}/../TFFM/'.format(PATH))
-from hit_module import HIT
+#sys.path.append('{0}/../TFFM/'.format(PATH))
+#from hit_module import HIT
 from sklearn.externals import joblib
 from argparsing import *
-from constants import BWTOOL, DNASHAPEINTER
+from the_constants import BWTOOL, DNASHAPEINTER
 from shapes import *
-from utils import *
+from utilities import *
 
 
 def find_pssm_hits(pssm, seq_file):
@@ -23,6 +23,8 @@ def find_pssm_hits(pssm, seq_file):
     import Bio.SeqIO
     from Bio.Alphabet import generic_dna
     from Bio.Alphabet.IUPAC import IUPACUnambiguousDNA as unambiguousDNA
+    import tffm_module
+    from hit_module import HIT
     hits = []
     for record in Bio.SeqIO.parse(seq_file, "fasta", generic_dna):
         record.seq.alphabet = unambiguousDNA()
@@ -41,13 +43,13 @@ def find_pssm_hits(pssm, seq_file):
 
 def find_tffm_hits(xml, seq_file):
     """ Predict hits in sequences using a TFFM. """
-    import sys
-    sys.path.append("/raid6/amathelier/TFFM+DNAshape/bin/TFFM/")
+    #import sys
+    #sys.path.append("/raid6/amathelier/TFFM+DNAshape/bin/TFFM/")
     import tffm_module
     from constants import TFFM_KIND  # TFFM-framework
     from hit_module import HIT
     tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.FIRST_ORDER)
-    return tffm.scan_sequences(seq_file, only_best=True)
+    return [hit for hit in tffm.scan_sequences(seq_file, only_best=True)]
 
 
 def fit_classifier(fg_train_hits, fg_train_shapes, bg_train_hits,
@@ -75,18 +77,19 @@ def make_predictions(clf, tests, hits, thr):
     for indx, proba in enumerate(clf.predict_proba(tests)):
         if proba[1] >= thr:
             hit = hits[indx]
-            predictions['peak_id'].append(hit.seq_record.name)
-            predictions['start'].append(hit.start)
-            predictions['end'].append(hit.end)
-            predictions['strand'].append(hit.strand)
-            if hit.strand == '-':
-                sequence = ''.join(
-                    hit.seq_record.seq[
-                        hit.start - 1:hit.end].reverse_complement())
-            else:
-                sequence = ''.join(hit.seq_record[hit.start - 1:hit.end])
-            predictions['sequence'].append(sequence)
-            predictions['proba'].append(proba[1])
+            if hit:
+                predictions['peak_id'].append(hit.seq_record.name)
+                predictions['start'].append(hit.start)
+                predictions['end'].append(hit.end)
+                predictions['strand'].append(hit.strand)
+                if hit.strand == '-':
+                    sequence = ''.join(
+                        hit.seq_record.seq[
+                            hit.start - 1:hit.end].reverse_complement())
+                else:
+                    sequence = ''.join(hit.seq_record[hit.start - 1:hit.end])
+                predictions['sequence'].append(sequence)
+                predictions['proba'].append(proba[1])
     return predictions
 
 
@@ -102,15 +105,14 @@ def print_predictions(predictions, output):
 
 
 def apply_classifier(hits, argu):
-    """ Apply the DNAshape-based classifier. """
+    """ Apply the DNAshape based classifier. """
     # Two options, 1) doing sequence by sequence but it means doing a lot of
     # bwtool calls and I/O, 2) doing all sequences as one batch but means that
     # we need to associate back probas to hits. I choose 2) to reduce I/O.
 
-    hits_shapes = get_shapes(pssm_hits, argu.in_bed, argu.helt, argu.mgw,
+    hits_shapes = get_shapes(hits, argu.in_bed, argu.helt, argu.mgw,
             argu.prot, argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
             argu.extension, argu.scaled)
-    assert len(hits) == len(hits_shapes[0])
     classifier = joblib.load(argu.classifier)
     tests = combine_hits_shapes(hits, hits_shapes, argu.extension)
     # Need to print the results by associating the probas to the hits
@@ -138,7 +140,7 @@ def train_classifier(fg_hits, bg_hits, argu):
     """ Train the DNAshape-based classifier. """
     fg_shapes = get_shapes(fg_hits, argu.fg_bed, argu.helt, argu.mgw, argu.prot,
             argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
-            argu.argu.extension, argu.scaled)
+            argu.extension, argu.scaled)
     bg_shapes = get_shapes(bg_hits, argu.bg_bed, argu.helt, argu.mgw, argu.prot,
             argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
             argu.extension, argu.scaled)

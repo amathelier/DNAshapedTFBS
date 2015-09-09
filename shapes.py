@@ -1,3 +1,7 @@
+from utilities import *
+from the_constants import BWTOOL, DNASHAPEINTER
+
+
 def get_scores(in_file, shape=None, scaled=False):
     """ Get DNAshape values on single lines. """
     with open(in_file) as stream:
@@ -22,9 +26,9 @@ def combine_hits_shapes(hits, shapes, extension=0):
             index += 1
             if shapes:
                 hit_shapes = []
-                for indx in xrange(len(dnashapes)):
+                for indx in xrange(len(shapes)):
                     hit_shapes += shapes[indx][index]
-                if (len(hit_shapes) == len(dnashapes) * (len(hit) + 2 *
+                if (len(hit_shapes) == len(shapes) * (len(hit) + 2 *
                     extension)):
                     values = [hit.score] + hit_shapes
                     comb.append(values)
@@ -38,23 +42,24 @@ def get_shapes(hits, bed_file, helt, mgw, prot, roll, helt2, mgw2, prot2, roll2,
     """ Retrieve DNAshape feature values for the hits. """
     bigwigs = [helt, prot, mgw, roll, helt2, prot2, mgw2, roll2]
     import subprocess
+    import os
     peaks_pos = get_positions_from_bed(bed_file)
     with open(os.devnull, 'w') as devnull:
         tmp_file = print_extended_hits(hits, peaks_pos, extension)
         shapes = ['HelT', 'ProT', 'MGW', 'Roll', 'HelT2', 'ProT2', 'MGW2',
-        'Roll2']
+                'Roll2']
         hits_shapes = []
         for indx, bigwig in enumerate(bigwigs):
             out_file = '{0}.{1}'.format(tmp_file, shapes[indx])
             subprocess.call([BWTOOL, 'ex', 'bed', tmp_file, bigwig, out_file],
                             stdout=devnull)
-            hits_shapes.append(get_scores(out_file, shapes[indx], scaled))
+            if indx < 4:
+                hits_shapes.append(get_scores(out_file, shapes[indx], scaled))
+            else:
+                hits_shapes.append(get_scores(out_file, shapes[indx]))
         subprocess.call(['rm', '{0}.HelT'.format(tmp_file),
             '{0}.MGW'.format(tmp_file), '{0}.ProT'.format(tmp_file),
             '{0}.Roll'.format(tmp_file), '{0}.HelT2'.format(tmp_file),
             '{0}.MGW2'.format(tmp_file), '{0}.ProT2'.format(tmp_file),
             '{0}.Roll2'.format(tmp_file),tmp_file])
         return hits_shapes
-
-
-
