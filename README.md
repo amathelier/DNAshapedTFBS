@@ -29,6 +29,12 @@ computation these features. Please visit the
 You can find some examples of how to run the DNAshapedTFBS.py tool in the script
 test.sh provided in the test/ repository of this package.
 
+## Project home page
+
+For information on the source tree, examples, issues, and pull requests, see
+
+    http://github.com/amathelier/DNAshapedTFBS
+
 ## Cite
 
 If you use this module, please cite
