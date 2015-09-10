@@ -19,6 +19,7 @@ version).
 * the BioPython module www.biopython.org.
 * the [TFFM package](http://cisreg.cmmt.ubc.ca/TFFM/doc/index.html) accessed from your
 PYTHONPATH environment variable.
+* the [scikit-learn module](http://scikit-learn.org/stable).
 * access to bigWig files providing the values of the DNA shape features HelT,
 MGW, ProT, and Roll from your genome interest along with the second order
 computation these features. Please visit the
@@ -47,3 +48,5 @@ Factor Binding Site Predictions. PLoS Comput Biol 9(9):e1003214.
 * T.-P. Chiu, L. Yang, T. Zhou, B.J. Main, S.C. Parker, S.V. Nuzhdin, T.D.
 Tullius, and R.R. Rohs (2015) GBshape: a genome browser database for DNA shape
 annotations. Nucleic Acids Res Jan,43(Database issue):D103-9.
+* Pedregosa et al (2011) Scikit-learn: Machine Learning in Python. JMLR 12, 
+pp. 2825-2830.
