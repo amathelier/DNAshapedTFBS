@@ -20,6 +20,7 @@ version).
 * the [TFFM package](http://cisreg.cmmt.ubc.ca/TFFM/doc/index.html) accessed from your
 PYTHONPATH environment variable.
 * the [scikit-learn module](http://scikit-learn.org/stable).
+* the [pandas module](http://pandas.pydata.org).
 * access to bigWig files providing the values of the DNA shape features HelT,
 MGW, ProT, and Roll from your genome interest along with the second order
 computation these features. Please visit the
@@ -29,6 +30,11 @@ computation these features. Please visit the
 
 You can find some examples of how to run the DNAshapedTFBS.py tool in the script
 test.sh provided in the test/ repository of this package.
+
+The script feature_importance_heatmap.py plots the heatmap(s) of trained
+classifier(s). You can get help on how to use it by typing
+
+python2.7 feature_importance_heatmap.py -h
 
 ## Project home page
 
