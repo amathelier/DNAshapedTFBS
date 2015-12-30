@@ -26,13 +26,13 @@ def tffm_train_arg_parsing(subparsers):
                           dest='output', action='store',
                           help='Output base name (.pkl will be added).')
     help_str = 'List of 1st-order bigWig files as\n'
-    help_str += '-1 HelT MGW ProT Roll'
+    help_str += '-1 HelT ProT MGW Roll'
     help_str += ' (note that we assume such an order)'
     parser_t.add_argument('-1', '--1storder', required=True, type=str,
                           dest='first_shape', action='store', nargs=4,
                           help=help_str)
     help_str = 'List of 2nd-order bigWig files as\n'
-    help_str += '-2 HelT2 MGW2 ProT2 Roll2'
+    help_str += '-2 HelT2 ProT2 MGW2 Roll2'
     help_str += ' (note that we assume such an order)'
     parser_t.add_argument('-2', '--2ndorder', required=False, type=str,
                           dest='second_shape', action='store', nargs=4,
