@@ -37,10 +37,10 @@ def combine_hits_shapes(hits, shapes, extension=0):
     return comb
 
 
-def get_shapes(hits, bed_file, helt, mgw, prot, roll, helt2, mgw2, prot2, roll2,
-        extension=0, scaled=False):
+def get_shapes(hits, bed_file, first_shape, second_shape, extension=0,
+        scaled=False):
     """ Retrieve DNAshape feature values for the hits. """
-    bigwigs = [helt, prot, mgw, roll, helt2, prot2, mgw2, roll2]
+    bigwigs = first_shape + second_shape
     import subprocess
     import os
     peaks_pos = get_positions_from_bed(bed_file)
@@ -50,14 +50,15 @@ def get_shapes(hits, bed_file, helt, mgw, prot, roll, helt2, mgw2, prot2, roll2,
                 'Roll2']
         hits_shapes = []
         for indx, bigwig in enumerate(bigwigs):
-            out_file = '{0}.{1}'.format(tmp_file, shapes[indx])
-            subprocess.call([BWTOOL, 'ex', 'bed', tmp_file, bigwig, out_file],
-                            stdout=devnull)
-            if indx < 4:
-                hits_shapes.append(get_scores(out_file, shapes[indx], scaled))
-            else:
-                hits_shapes.append(get_scores(out_file, shapes[indx]))
-        subprocess.call(['rm', '{0}.HelT'.format(tmp_file),
+            if bigwig:
+                out_file = '{0}.{1}'.format(tmp_file, shapes[indx])
+                subprocess.call([BWTOOL, 'ex', 'bed', tmp_file, bigwig, out_file],
+                                stdout=devnull)
+                if indx < 4:
+                    hits_shapes.append(get_scores(out_file, shapes[indx], scaled))
+                else:
+                    hits_shapes.append(get_scores(out_file, shapes[indx]))
+        subprocess.call(['rm', '-f', '{0}.HelT'.format(tmp_file),
             '{0}.MGW'.format(tmp_file), '{0}.ProT'.format(tmp_file),
             '{0}.Roll'.format(tmp_file), '{0}.HelT2'.format(tmp_file),
             '{0}.MGW2'.format(tmp_file), '{0}.ProT2'.format(tmp_file),

@@ -3,12 +3,12 @@
 
 """ Train and apply TFFM/PSSM + DNAshape classifiers. """
 
-#import os
-#PATH = os.path.dirname(os.path.realpath(__file__))
-#import sys
+import os
+PATH = os.path.dirname(os.path.realpath(__file__))
+import sys
 # Local environment
-#sys.path.append('{0}/../TFFM/'.format(PATH))
-#from hit_module import HIT
+sys.path.append('{0}/../TFFM/'.format(PATH))
+from hit_module import HIT
 from sklearn.externals import joblib
 from argparsing import *
 from the_constants import BWTOOL, DNASHAPEINTER
@@ -110,9 +110,10 @@ def apply_classifier(hits, argu):
     # bwtool calls and I/O, 2) doing all sequences as one batch but means that
     # we need to associate back probas to hits. I choose 2) to reduce I/O.
 
-    hits_shapes = get_shapes(hits, argu.in_bed, argu.helt, argu.mgw,
-            argu.prot, argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
-            argu.extension, argu.scaled)
+    hits_shapes = get_shapes(hits, argu.in_bed, argu.first_shape,
+            argu.second_shape, argu.extension, argu.scaled)
+    print len(hits_shapes)
+    print len(hits_shapes[0])
     classifier = joblib.load(argu.classifier)
     tests = combine_hits_shapes(hits, hits_shapes, argu.extension)
     # Need to print the results by associating the probas to the hits
@@ -138,12 +139,10 @@ def pssm_apply_classifier(argu):
 
 def train_classifier(fg_hits, bg_hits, argu):
     """ Train the DNAshape-based classifier. """
-    fg_shapes = get_shapes(fg_hits, argu.fg_bed, argu.helt, argu.mgw, argu.prot,
-            argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
-            argu.extension, argu.scaled)
-    bg_shapes = get_shapes(bg_hits, argu.bg_bed, argu.helt, argu.mgw, argu.prot,
-            argu.roll, argu.helt2, argu.mgw2, argu.prot2, argu.roll2,
-            argu.extension, argu.scaled)
+    fg_shapes = get_shapes(fg_hits, argu.fg_bed, argu.first_shape,
+            argu.second_shape, argu.extension, argu.scaled)
+    bg_shapes = get_shapes(bg_hits, argu.bg_bed, argu.first_shape,
+            argu.second_shape, argu.extension, argu.scaled)
     classifier = fit_classifier(fg_hits, fg_shapes, bg_hits, bg_shapes,
                                 argu.extension)
     joblib.dump(classifier, '{0}.pkl'.format(argu.output))

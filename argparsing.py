@@ -24,23 +24,19 @@ def tffm_train_arg_parsing(subparsers):
                           dest='bg_bed', action='store', help=help_str)
     parser_t.add_argument('-o', '--outfile', required=True, type=str,
                           dest='output', action='store',
-                          help='Output base name (.plk will be added).')
-    parser_t.add_argument('-H', '--HelT', required=True, type=str, dest='helt',
-                          action='store', help='HelT bigWig file.')
-    parser_t.add_argument('-M', '--MWG', required=True, type=str, dest='mgw',
-                          action='store', help='MGW bigWig file.')
-    parser_t.add_argument('-P', '--ProT', required=True, type=str, dest='prot',
-                          action='store', help='ProT bigWig file.')
-    parser_t.add_argument('-R', '--Roll', required=True, type=str, dest='roll',
-                          action='store', help='Roll bigWig file.')
-    parser_t.add_argument('-E', '--HelT2', required=True, type=str, dest='helt2',
-                          action='store', help='2nd order HelT bigWig file.')
-    parser_t.add_argument('-G', '--MGW2', required=True, type=str, dest='mgw2',
-                          action='store', help='2nd order MGW bigWig file.')
-    parser_t.add_argument('-O', '--ProT2', required=True, type=str, dest='prot2',
-                          action='store', help='2nd order ProT bigWig file.')
-    parser_t.add_argument('-L', '--Roll2', required=True, type=str, dest='roll2',
-                          action='store', help='2nd order Roll bigWig file.')
+                          help='Output base name (.pkl will be added).')
+    help_str = 'List of 1st-order bigWig files as\n'
+    help_str += '-1 HelT MGW ProT Roll'
+    help_str += ' (note that we assume such an order)'
+    parser_t.add_argument('-1', '--1storder', required=True, type=str,
+                          dest='first_shape', action='store', nargs=4,
+                          help=help_str)
+    help_str = 'List of 2nd-order bigWig files as\n'
+    help_str += '-2 HelT2 MGW2 ProT2 Roll2'
+    help_str += ' (note that we assume such an order)'
+    parser_t.add_argument('-2', '--2ndorder', required=False, type=str,
+                          dest='second_shape', action='store', nargs=4,
+                          default=[], help=help_str)
     parser_t.add_argument('-n', '--scaled', required=False, dest='scaled',
                           action='store_true', default=False,
                           help='Scale DNAshape values in [0, 1]')
@@ -66,26 +62,22 @@ def tffm_apply_arg_parsing(subparsers):
                           dest='in_bed', action='store', help=help_str)
     parser_a.add_argument('-c', '--classifier', required=True, type=str,
                           dest='classifier', action='store',
-                          help='Classifier (.plk file).')
+                          help='Classifier (.pkl file).')
     parser_a.add_argument('-o', '--outfile', required=True, type=str,
                           dest='output', action='store',
                           help='Output result file')
-    parser_a.add_argument('-H', '--HelT', required=True, type=str, dest='helt',
-                          action='store', help='HelT bigWig file.')
-    parser_a.add_argument('-M', '--MGW', required=True, type=str, dest='mgw',
-                          action='store', help='MGW bigWig file.')
-    parser_a.add_argument('-P', '--ProT', required=True, type=str, dest='prot',
-                          action='store', help='ProT bigWig file.')
-    parser_a.add_argument('-R', '--Roll', required=True, type=str, dest='roll',
-                          action='store', help='Roll bigWig file.')
-    parser_a.add_argument('-E', '--HelT2', required=True, type=str, dest='helt2',
-                          action='store', help='2nd order HelT bigWig file.')
-    parser_a.add_argument('-G', '--MGW2', required=True, type=str, dest='mgw2',
-                          action='store', help='2nd order MGW bigWig file.')
-    parser_a.add_argument('-O', '--ProT2', required=True, type=str, dest='prot2',
-                          action='store', help='2nd order ProT bigWig file.')
-    parser_a.add_argument('-L', '--Roll2', required=True, type=str, dest='roll2',
-                          action='store', help='2nd order Roll bigWig file.')
+    help_str = 'List of 1st-order bigWig files as\n'
+    help_str += '-1 HelT MGW ProT Roll'
+    help_str += ' (note that we assume such an order)'
+    parser_a.add_argument('-1', '--1storder', required=True, type=str,
+                          dest='first_shape', action='store', nargs=4,
+                          help=help_str)
+    help_str = 'List of 2nd-order bigWig files as: '
+    help_str += '-2 HelT2 MGW2 ProT2 Roll2'
+    help_str += ' (note that we assume such an order)'
+    parser_a.add_argument('-2', '--2ndorder', required=False, type=str,
+                          dest='second_shape', action='store', nargs=4,
+                          default=[], help=help_str)
     parser_a.add_argument('-n', '--scaled', required=False, dest='scaled',
                           action='store_true', default=False,
                           help='Scale DNAshape values in [0, 1]')
@@ -128,23 +120,19 @@ def pssm_train_arg_parsing(subparsers):
                           dest='bg_bed', action='store', help=help_str)
     parser_t.add_argument('-o', '--outfile', required=True, type=str,
                           dest='output', action='store',
-                          help='Output base name (.plk will be added).')
-    parser_t.add_argument('-H', '--HelT', required=True, type=str, dest='helt',
-                          action='store', help='HelT bigWig file.')
-    parser_t.add_argument('-M', '--MWG', required=True, type=str, dest='mgw',
-                          action='store', help='MGW bigWig file.')
-    parser_t.add_argument('-P', '--ProT', required=True, type=str, dest='prot',
-                          action='store', help='ProT bigWig file.')
-    parser_t.add_argument('-R', '--Roll', required=True, type=str, dest='roll',
-                          action='store', help='Roll bigWig file.')
-    parser_t.add_argument('-E', '--HelT2', required=True, type=str, dest='helt2',
-                          action='store', help='2nd order HelT bigWig file.')
-    parser_t.add_argument('-G', '--MGW2', required=True, type=str, dest='mgw2',
-                          action='store', help='2nd order MGW bigWig file.')
-    parser_t.add_argument('-O', '--ProT2', required=True, type=str, dest='prot2',
-                          action='store', help='2nd order ProT bigWig file.')
-    parser_t.add_argument('-L', '--Roll2', required=True, type=str, dest='roll2',
-                          action='store', help='2nd order Roll bigWig file.')
+                          help='Output base name (.pkl will be added).')
+    help_str = 'List of 1st-order bigWig files as\n'
+    help_str += '-1 HelT MGW ProT Roll'
+    help_str += ' (note that we assume such an order)'
+    parser_t.add_argument('-1', '--1storder', required=True, type=str,
+                          dest='first_shape', action='store', nargs=4,
+                          help=help_str)
+    help_str = 'List of 2nd-order bigWig files as\n'
+    help_str += '-2 HelT2 MGW2 ProT2 Roll2'
+    help_str += ' (note that we assume such an order)'
+    parser_t.add_argument('-2', '--2ndorder', required=False, type=str,
+                          dest='second_shape', action='store', nargs=4,
+                          default=[], help=help_str)
     parser_t.add_argument('-n', '--scaled', required=False, dest='scaled',
                           action='store_true', default=False,
                           help='Scale DNAshape values in [0, 1]')
@@ -177,26 +165,22 @@ def pssm_apply_arg_parsing(subparsers):
                           dest='in_bed', action='store', help=help_str)
     parser_a.add_argument('-c', '--classifier', required=True, type=str,
                           dest='classifier', action='store',
-                          help='Classifier (.plk file).')
+                          help='Classifier (.pkl file).')
     parser_a.add_argument('-o', '--outfile', required=True, type=str,
                           dest='output', action='store',
                           help='Output result file')
-    parser_a.add_argument('-H', '--HelT', required=True, type=str, dest='helt',
-                          action='store', help='HelT bigWig file.')
-    parser_a.add_argument('-M', '--MGW', required=True, type=str, dest='mgw',
-                          action='store', help='MGW bigWig file.')
-    parser_a.add_argument('-P', '--ProT', required=True, type=str, dest='prot',
-                          action='store', help='ProT bigWig file.')
-    parser_a.add_argument('-R', '--Roll', required=True, type=str, dest='roll',
-                          action='store', help='Roll bigWig file.')
-    parser_a.add_argument('-E', '--HelT2', required=True, type=str, dest='helt2',
-                          action='store', help='2nd order HelT bigWig file.')
-    parser_a.add_argument('-G', '--MGW2', required=True, type=str, dest='mgw2',
-                          action='store', help='2nd order MGW bigWig file.')
-    parser_a.add_argument('-O', '--ProT2', required=True, type=str, dest='prot2',
-                          action='store', help='2nd order ProT bigWig file.')
-    parser_a.add_argument('-L', '--Roll2', required=True, type=str, dest='roll2',
-                          action='store', help='2nd order Roll bigWig file.')
+    help_str = 'List of 1st-order bigWig files as\n'
+    help_str += '-1 HelT MGW ProT Roll'
+    help_str += ' (note that we assume such an order)'
+    parser_a.add_argument('-1', '--1storder', required=True, type=str,
+                          dest='first_shape', action='store', nargs=4,
+                          help=help_str)
+    help_str = 'List of 2nd-order bigWig files as\n'
+    help_str += '-2 HelT2 MGW2 ProT2 Roll2'
+    help_str += ' (note that we assume such an order)'
+    parser_a.add_argument('-2', '--2ndorder', required=False, type=str,
+                          dest='second_shape', action='store', nargs=4,
+                          default=[], help=help_str)
     parser_a.add_argument('-n', '--scaled', required=False, dest='scaled',
                           action='store_true', default=False,
                           help='Scale DNAshape values in [0, 1]')
