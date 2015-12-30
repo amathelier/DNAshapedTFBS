@@ -112,8 +112,6 @@ def apply_classifier(hits, argu):
 
     hits_shapes = get_shapes(hits, argu.in_bed, argu.first_shape,
             argu.second_shape, argu.extension, argu.scaled)
-    print len(hits_shapes)
-    print len(hits_shapes[0])
     classifier = joblib.load(argu.classifier)
     tests = combine_hits_shapes(hits, hits_shapes, argu.extension)
     # Need to print the results by associating the probas to the hits
