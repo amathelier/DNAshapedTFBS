@@ -49,7 +49,7 @@ def find_tffm_hits(xml, seq_file):
     from constants import TFFM_KIND  # TFFM-framework
     from hit_module import HIT
     tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.FIRST_ORDER)
-    return [hit for hit in tffm.scan_sequences(seq_file, only_best=True)]
+    return [hit for hit in tffm.scan_sequences(seq_file, only_best=True) if hit]
 
 
 def fit_classifier(fg_train_hits, fg_train_shapes, bg_train_hits,
@@ -122,7 +122,11 @@ def apply_classifier(hits, argu):
 def tffm_apply_classifier(argu):
     """ Apply the TFFM + DNA shape classifier. """
     hits = find_tffm_hits(argu.tffm_file, argu.in_fasta)
-    apply_classifier(hits, argu)
+    if hits:
+        apply_classifier(hits, argu)
+    else:
+        with open(argu.output, 'w') as stream:
+            stream.write('No hit predicted\n')
 
 
 def pssm_apply_classifier(argu):
@@ -132,7 +136,11 @@ def pssm_apply_classifier(argu):
     else:
         pssm = get_jaspar_pssm(argu.jasparfile, False)
     hits = find_pssm_hits(pssm, argu.in_fasta)
-    apply_classifier(hits, argu)
+    if hits:
+        apply_classifier(hits, argu)
+    else:
+        with open(argu.output, 'w') as stream:
+            stream.write('No hit predicted\n')
 
 
 def train_classifier(fg_hits, bg_hits, argu):
