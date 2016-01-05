@@ -85,8 +85,8 @@ def get_jaspar_pssm(jaspar, bool_id=True):
         jdb = JASPAR5(host=jaspar_db_host, name=jaspar_db_name,
                       user=jaspar_db_user, password=jaspar_db_pass)
         motif = jdb.fetch_motif_by_id(jaspar)
+        motif.pseudocounts = Bio.motifs.jaspar.calculate_pseudocounts(motif)
     else:
         with open(jaspar) as handle:
             motif = Bio.motifs.read(handle, 'jaspar')
-    motif.pseudocounts = Bio.motifs.jaspar.calculate_pseudocounts(motif)
     return motif.pssm
