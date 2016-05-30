@@ -1,12 +1,13 @@
 #!/usr/bin/python
 #*-* coding: utf-8 *-*
 
-""" Train and apply TFFM/PSSM + DNAshape classifiers. """
+""" Train and apply PSSM/TFFM/4-bits + DNAshape classifiers. """
 
 import os
 PATH = os.path.dirname(os.path.realpath(__file__))
 import sys
 # Local environment
+# TODO: Test if TFFM is installed instead of using local env.
 sys.path.append('{0}/../TFFM/'.format(PATH))
 from hit_module import HIT
 from sklearn.externals import joblib
@@ -52,22 +53,24 @@ def find_tffm_hits(xml, seq_file):
     return [hit for hit in tffm.scan_sequences(seq_file, only_best=True) if hit]
 
 
-def fit_classifier(fg_train_hits, fg_train_shapes, bg_train_hits,
-                   bg_train_shapes, extension=0):
-    """ Fit the classifier to the training data. """
-    from sklearn.ensemble import GradientBoostingClassifier
-    fg_train = combine_hits_shapes(fg_train_hits, fg_train_shapes, extension)
-    bg_train = combine_hits_shapes(bg_train_hits, bg_train_shapes, extension)
-    data, classification = construct_classifier_input(fg_train, bg_train)
-    classifier = GradientBoostingClassifier()
-    classifier.fit(data, classification)
-    return classifier
-
-
 def construct_classifier_input(foreground, background):
     """ Make list of classes for foreground and background. """
     classes = [1.0] * len(foreground) + [0.0] * len(background)
     return foreground + background, classes
+
+
+def fit_classifier(fg_train_hits, fg_train_shapes, bg_train_hits,
+                   bg_train_shapes, extension=0, bool4bits=False):
+    """ Fit the classifier to the training data. """
+    from sklearn.ensemble import GradientBoostingClassifier
+    fg_train = combine_hits_shapes(fg_train_hits, fg_train_shapes, extension,
+            bool4bits)
+    bg_train = combine_hits_shapes(bg_train_hits, bg_train_shapes, extension,
+            bool4bits)
+    data, classification = construct_classifier_input(fg_train, bg_train)
+    classifier = GradientBoostingClassifier()
+    classifier.fit(data, classification)
+    return classifier
 
 
 def make_predictions(clf, tests, hits, thr):
@@ -104,7 +107,7 @@ def print_predictions(predictions, output):
                                   'sequence', 'proba'])))
 
 
-def apply_classifier(hits, argu):
+def apply_classifier(hits, argu, bool4bits=False):
     """ Apply the DNAshape based classifier. """
     # Two options, 1) doing sequence by sequence but it means doing a lot of
     # bwtool calls and I/O, 2) doing all sequences as one batch but means that
@@ -113,7 +116,8 @@ def apply_classifier(hits, argu):
     hits_shapes = get_shapes(hits, argu.in_bed, argu.first_shape,
             argu.second_shape, argu.extension, argu.scaled)
     classifier = joblib.load(argu.classifier)
-    tests = combine_hits_shapes(hits, hits_shapes, argu.extension)
+    tests = combine_hits_shapes(encode_hits(hits), hits_shapes, argu.extension,
+            bool4bits)
     # Need to print the results by associating the probas to the hits
     predictions = make_predictions(classifier, tests, hits, argu.threshold)
     print_predictions(predictions, argu.output)
@@ -143,14 +147,32 @@ def pssm_apply_classifier(argu):
             stream.write('No hit predicted\n')
 
 
-def train_classifier(fg_hits, bg_hits, argu):
+def binary_apply_classifier(argu):
+    """ Apply the 4-bits + DNA shape classifier. """
+    if argu.jasparid:
+        pssm = get_jaspar_pssm(argu.jasparid)
+    else:
+        pssm = get_jaspar_pssm(argu.jasparfile, False)
+    hits = find_pssm_hits(pssm, argu.in_fasta)
+    if hits:
+        apply_classifier(hits, argu, True)
+    else:
+        with open(argu.output, 'w') as stream:
+            stream.write('No hit predicted\n')
+
+
+def train_classifier(fg_hits, bg_hits, argu, bool4bits=False):
     """ Train the DNAshape-based classifier. """
     fg_shapes = get_shapes(fg_hits, argu.fg_bed, argu.first_shape,
             argu.second_shape, argu.extension, argu.scaled)
     bg_shapes = get_shapes(bg_hits, argu.bg_bed, argu.first_shape,
             argu.second_shape, argu.extension, argu.scaled)
-    classifier = fit_classifier(fg_hits, fg_shapes, bg_hits, bg_shapes,
-                                argu.extension)
+    if bool4bits:
+        classifier = fit_classifier(encode_hits(fg_hits), fg_shapes,
+                encode_hits(bg_hits), bg_shapes, argu.extension, bool4bits)
+    else:
+        classifier = fit_classifier(fg_hits, fg_shapes, bg_hits, bg_shapes,
+                argu.extension, bool4bits)
     joblib.dump(classifier, '{0}.pkl'.format(argu.output))
 
 
@@ -170,6 +192,17 @@ def pssm_train_classifier(argu):
     fg_hits = find_pssm_hits(pssm, argu.fg_fasta)
     bg_hits = find_pssm_hits(pssm, argu.bg_fasta)
     train_classifier(fg_hits, bg_hits, argu)
+
+
+def binary_train_classifier(argu):
+    """ Train a 4-bits + DNA shape classifier. """
+    if argu.jasparid:
+        pssm = get_jaspar_pssm(argu.jasparid)
+    else:
+        pssm = get_jaspar_pssm(argu.jasparfile, False)
+    fg_hits = find_pssm_hits(pssm, argu.fg_fasta)
+    bg_hits = find_pssm_hits(pssm, argu.bg_fasta)
+    train_classifier(fg_hits, bg_hits, argu, True)
 
 
 ##############################################################################

@@ -64,6 +64,15 @@ def get_positions_from_bed(bed_file):
     return positions
 
 
+def contains_zero(motif):
+    """ Return True if the PSSM contains a 0 frequency at one position. """
+    for nucleotide in 'ACGT':
+        for count in motif.counts[nucleotide]:
+            if count == 0.:
+                return True
+    return False
+
+
 def get_jaspar_pssm(jaspar, bool_id=True):
     """ 
     
@@ -78,9 +87,10 @@ def get_jaspar_pssm(jaspar, bool_id=True):
     import Bio.motifs
     if bool_id:
         from Bio.motifs.jaspar.db import JASPAR5
-        jaspar_db_host = "vm5.cmmt.ubc.ca"
-        jaspar_db_name = "JASPAR_2014"
-        jaspar_db_user = "jaspar_r"
+        # Please put your local JASPAR database information below
+        jaspar_db_host = ""
+        jaspar_db_name = ""
+        jaspar_db_user = ""
         jaspar_db_pass = ""
         jdb = JASPAR5(host=jaspar_db_host, name=jaspar_db_name,
                       user=jaspar_db_user, password=jaspar_db_pass)
@@ -89,4 +99,25 @@ def get_jaspar_pssm(jaspar, bool_id=True):
     else:
         with open(jaspar) as handle:
             motif = Bio.motifs.read(handle, 'jaspar')
+            # If the PFM contains a zero, need to use pseudocounts
+            if contains_zero(motif):
+                import sys
+                # The pseudocount will be minimal
+                motif.pseudocounts = sys.float_info.min
     return motif.pssm
+
+
+def encode_hits(hits):
+    """
+    Encode the sequence at hits using a binary encoding (4bits per nucleotide).
+
+    hits corresponds to a list of HIT (TFFM module) instances.
+    
+    """
+    mapping = {'A': [1, 0, 0, 0], 'T': [0, 1, 0, 0],
+            'G': [0, 0, 1, 0], 'C': [0, 0, 0, 1]}
+    encoding = []
+    for hit in hits:
+        encoding.append(
+                [val for nucl in hit.sequence() for val in mapping[nucl]])
+    return encoding
