@@ -1,6 +1,6 @@
 # DNAshapedTFBS
 
-## Python module for TFFM/PSSM + DNA shape classifiers
+## Python module for TFFM/PSSM/4-bits + DNA shape classifiers
 
 This module allows for:
 
