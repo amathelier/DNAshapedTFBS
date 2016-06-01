@@ -48,16 +48,5 @@ For information on the source tree, examples, issues, and pull requests, see
 If you use this module, please cite
 
 * A. Mathelier, B. Xin, T.-P. Chiu, L. Yang, R.R. Rohs, and W.W. Wasserman (2016)
-DNA shape features improve transcription factor binding site predictions in
-vivo. Under revision.
-* A. Mathelier and W.W. Wasserman (2013) The Next Generation of Transcription
-Factor Binding Site Predictions. PLoS Comput Biol 9(9):e1003214.
-* T.-P. Chiu, L. Yang, T. Zhou, B.J. Main, S.C. Parker, S.V. Nuzhdin, T.D.
-Tullius, and R.R. Rohs (2015) GBshape: a genome browser database for DNA shape
-annotations. Nucleic Acids Res Jan,43(Database issue):D103-9.
-* T. Zhou, L. Yang, Y. Lu, I. Dror, AC. Dantas Machado, T. Ghane, R. Di Felice,
-and R. Rohs (2013) DNAshape: a method for the high-throughput prediction of DNA
-structural features on a genomic scale. Nucleic Acids Research 41(Web Server
-issue):W56-62.
-* Pedregosa et al. (2011) Scikit-learn: Machine Learning in Python. JMLR 12, 
-pp. 2825-2830.
+DNA shape features improve transcription factor binding site predictions *in
+vivo*. Under revision.
