@@ -25,6 +25,7 @@ PYTHONPATH environment variable.
 MGW, ProT, and Roll from your genome interest along with the second order
 computation these features. Please visit the
 [GBshape website](rohsdb.cmb.usc.edu/GBshape).
+* the [bwtool](https://github.com/CRG-Barcelona/bwtool).
 
 ## Tutorial
 
@@ -45,8 +46,9 @@ For information on the source tree, examples, issues, and pull requests, see
 
 ## Cite
 
-If you use this module, please cite
+If you use the DNAshapedTFBS tool, please cite
 
 * A. Mathelier, B. Xin, T.-P. Chiu, L. Yang, R.R. Rohs, and W.W. Wasserman (2016)
 DNA shape features improve transcription factor binding site predictions *in
-vivo*. Under revision.
+vivo*. *Cell Systems*,
+DOI:[10.1016/j.cels.2016.07.001](http://dx.doi.org/10.1016/j.cels.2016.07.001).
