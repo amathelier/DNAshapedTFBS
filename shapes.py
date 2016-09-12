@@ -19,10 +19,10 @@ def get_scores(in_file, shape=None, scaled=False):
 
 def combine_hits_shapes(hits, shapes, extension=0, binary_encoding=False):
     """ Combine DNA sequence and shape features.
-    
+
     The hit scores (PSSM or TFFM) or 4-bits encoding are combined with DNAshape
     features in vectors for classif.
-    
+
     """
     comb = []
     index = -1
@@ -40,7 +40,7 @@ def combine_hits_shapes(hits, shapes, extension=0, binary_encoding=False):
                    ):
                     comb.append([hit.score] + hit_shapes)
                 elif (binary_encoding and
-                        (len(hit_shapes) == 
+                        (len(hit_shapes) ==
                             len(shapes) * (len(hit) / 4 + 2 * extension)
                         )
                      ):

@@ -50,6 +50,7 @@ def find_tffm_hits(xml, seq_file):
     from constants import TFFM_KIND  # TFFM-framework
     from hit_module import HIT
     tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.FIRST_ORDER)
+    #tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.DETAILED)
     return [hit for hit in tffm.scan_sequences(seq_file, only_best=True) if hit]
 
 
@@ -116,8 +117,12 @@ def apply_classifier(hits, argu, bool4bits=False):
     hits_shapes = get_shapes(hits, argu.in_bed, argu.first_shape,
             argu.second_shape, argu.extension, argu.scaled)
     classifier = joblib.load(argu.classifier)
-    tests = combine_hits_shapes(encode_hits(hits), hits_shapes, argu.extension,
-            bool4bits)
+    if bool4bits:
+        tests = combine_hits_shapes(encode_hits(hits), hits_shapes,
+                                    argu.extension, bool4bits)
+    else:
+        tests = combine_hits_shapes(hits, hits_shapes, argu.extension,
+                                    bool4bits)
     # Need to print the results by associating the probas to the hits
     predictions = make_predictions(classifier, tests, hits, argu.threshold)
     print_predictions(predictions, argu.output)
