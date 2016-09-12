@@ -5,13 +5,17 @@ from DNAshapedTFBS import tffm_apply_classifier
 from DNAshapedTFBS import pssm_apply_classifier
 from DNAshapedTFBS import binary_apply_classifier
 
-
 def tffm_train_arg_parsing(subparsers):
     """ Train the TFFM + DNA shape classifier. """
     help_str = "Train the TFFM + DNA shape classifier."
     parser_t = subparsers.add_parser('trainTFFM', help=help_str)
     parser_t.add_argument('-T', '--tffmfile', required=True, dest='tffm_file',
-            action='store', type=str, help='TFFM XML file.')
+                          action='store', type=str, help='TFFM XML file.')
+    parser_t.add_argument('-t', '--tffm_kind', required=False,
+                          dest='tffm_kind', action='store', type=str,
+                          choices=['first_order', 'detailed'],
+                          default='first_order',
+                          help='TFFM kind ("first_order" or "detailed").')
     help_str = 'Input fasta file containing the foreground sequences.'
     parser_t.add_argument('-i', '--fg_fasta', required=True, type=str,
                           dest='fg_fasta', action='store', help=help_str)
@@ -55,7 +59,12 @@ def tffm_apply_arg_parsing(subparsers):
     help_str = 'Apply the TFFM + DNA shape classifier.'
     parser_a = subparsers.add_parser('applyTFFM', help=help_str)
     parser_a.add_argument('-T', '--tffmfile', required=True, dest='tffm_file',
-            action='store', type=str, help='TFFM XML file.')
+                          action='store', type=str, help='TFFM XML file.')
+    parser_a.add_argument('-t', '--tffm_kind', required=False,
+                          dest='tffm_kind', action='store', type=str,
+                          choices=['first_order', 'detailed'],
+                          default='first_order',
+                          help='TFFM kind ("first_order" or "detailed").')
     help_str = 'Input fasta file containing the sequences.'
     parser_a.add_argument('-i', '--input_fasta', required=True, type=str,
                           dest='in_fasta', action='store', help=help_str)

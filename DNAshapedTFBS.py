@@ -9,7 +9,6 @@ import sys
 # Local environment
 # TODO: Test if TFFM is installed instead of using local env.
 sys.path.append('{0}/../TFFM/'.format(PATH))
-from hit_module import HIT
 from sklearn.externals import joblib
 from argparsing import *
 from the_constants import BWTOOL, DNASHAPEINTER
@@ -42,16 +41,21 @@ def find_pssm_hits(pssm, seq_file):
     return hits
 
 
-def find_tffm_hits(xml, seq_file):
+def find_tffm_hits(xml, seq_file, tffm_kind):
     """ Predict hits in sequences using a TFFM. """
     #import sys
     #sys.path.append("/raid6/amathelier/TFFM+DNAshape/bin/TFFM/")
     import tffm_module
     from constants import TFFM_KIND  # TFFM-framework
-    from hit_module import HIT
-    tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.FIRST_ORDER)
-    #tffm = tffm_module.tffm_from_xml(xml, TFFM_KIND.DETAILED)
-    return [hit for hit in tffm.scan_sequences(seq_file, only_best=True) if hit]
+    if tffm_kind == 'first_order':
+        tffm_kind = TFFM_KIND.FIRST_ORDER
+    elif tffm_kind == 'detailed':
+        tffm_kind = TFFM_KIND.DETAILED
+    else:
+        sys.exit('The type of TFFM should be "first_order" or "detailed".')
+    tffm = tffm_module.tffm_from_xml(xml, tffm_kind)
+    return [hit for hit in
+            tffm.scan_sequences(seq_file, only_best=True) if hit]
 
 
 def construct_classifier_input(foreground, background):
@@ -130,7 +134,7 @@ def apply_classifier(hits, argu, bool4bits=False):
 
 def tffm_apply_classifier(argu):
     """ Apply the TFFM + DNA shape classifier. """
-    hits = find_tffm_hits(argu.tffm_file, argu.in_fasta)
+    hits = find_tffm_hits(argu.tffm_file, argu.in_fasta, argu.tffm_kind)
     if hits:
         apply_classifier(hits, argu)
     else:
@@ -183,8 +187,8 @@ def train_classifier(fg_hits, bg_hits, argu, bool4bits=False):
 
 def tffm_train_classifier(argu):
     """ Train a TFFM + DNA shape classifier. """
-    fg_hits = find_tffm_hits(argu.tffm_file, argu.fg_fasta)
-    bg_hits = find_tffm_hits(argu.tffm_file, argu.bg_fasta)
+    fg_hits = find_tffm_hits(argu.tffm_file, argu.fg_fasta, argu.tffm_kind)
+    bg_hits = find_tffm_hits(argu.tffm_file, argu.bg_fasta, argu.tffm_kind)
     train_classifier(fg_hits, bg_hits, argu)
 
 
