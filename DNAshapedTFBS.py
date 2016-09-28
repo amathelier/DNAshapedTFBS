@@ -31,13 +31,14 @@ def find_pssm_hits(pssm, seq_file):
         scores = [(pos, ((score - pssm.min) / (pssm.max - pssm.min)))
                   for pos, score in pssm.search(record.seq, pssm.min) if not
                   math.isnan(score)]
-        pos_maxi, maxi = max(scores, key=itemgetter(1))
-        strand = "+"
-        if pos_maxi < 0:
-            strand = "-"
-            pos_maxi = pos_maxi + len(record.seq)
-        hits.append(HIT(record, pos_maxi + 1, pos_maxi + pssm.length, strand,
-                        maxi))
+        if scores:
+            pos_maxi, maxi = max(scores, key=itemgetter(1))
+            strand = "+"
+            if pos_maxi < 0:
+                strand = "-"
+                pos_maxi = pos_maxi + len(record.seq)
+            hits.append(HIT(record, pos_maxi + 1, pos_maxi + pssm.length,
+                            strand, maxi))
     return hits
 
 
