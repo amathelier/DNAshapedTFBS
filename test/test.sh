@@ -1,5 +1,5 @@
 export PYTHONPATH=$PYTHONPATH:./
- Define where are located the DNA shape data from GBshape
+# Define where are located the DNA shape data from GBshape
 araTha=/storage/mathelierarea/raw/GBshape/araTha10/
 helt=$araTha/araTha10.HelT.bigWig;
 mgw=$araTha/araTha10.MGW.bigWig;
