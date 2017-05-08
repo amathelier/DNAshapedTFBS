@@ -20,6 +20,7 @@ version).
 * the [TFFM package](http://cisreg.cmmt.ubc.ca/TFFM/doc/index.html) accessed from your
 PYTHONPATH environment variable.
 * the [scikit-learn module](http://scikit-learn.org/stable).
+* the [XGBoost module](http://xgboost.readthedocs.io/en/latest/model.html).
 * the [pandas module](http://pandas.pydata.org).
 * access to bigWig files providing the values of the DNA shape features HelT,
 MGW, ProT, and Roll from your genome interest along with the second order
