@@ -8,7 +8,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 import sys
 # Local environment
 # TODO: Test if TFFM is installed instead of using local env.
-sys.path.append('{0}/../TFFM/'.format(PATH))
+sys.path.append('{0}/./TFFM/'.format(PATH))
 from sklearn.externals import joblib
 from argparsing import *
 from the_constants import BWTOOL, DNASHAPEINTER
@@ -61,20 +61,22 @@ def find_tffm_hits(xml, seq_file, tffm_kind):
 
 def construct_classifier_input(foreground, background):
     """ Make list of classes for foreground and background. """
+    import numpy as np
     classes = [1.0] * len(foreground) + [0.0] * len(background)
-    return foreground + background, classes
+    return np.asmatrix(foreground + background), classes
 
 
 def fit_classifier(fg_train_hits, fg_train_shapes, bg_train_hits,
                    bg_train_shapes, extension=0, bool4bits=False):
     """ Fit the classifier to the training data. """
+    from xgboost import XGBClassifier
     from sklearn.ensemble import GradientBoostingClassifier
     fg_train = combine_hits_shapes(fg_train_hits, fg_train_shapes, extension,
             bool4bits)
     bg_train = combine_hits_shapes(bg_train_hits, bg_train_shapes, extension,
             bool4bits)
     data, classification = construct_classifier_input(fg_train, bg_train)
-    classifier = GradientBoostingClassifier()
+    classifier= XGBClassifier(nthread=1)
     classifier.fit(data, classification)
     return classifier
 
